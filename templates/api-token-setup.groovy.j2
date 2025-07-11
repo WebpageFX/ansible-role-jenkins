@@ -1,0 +1,22 @@
+#!groovy
+import hudson.model.User
+import jenkins.security.*
+
+// Configuration - these variables will be replaced by Ansible templating
+def adminUsername = "{{ jenkins_admin_username }}"
+def apiTokenName = "{{ jenkins_admin_username }}-token"
+def apiTokenValue = "{{ jenkins_api_token }}"
+
+def user = User.get(adminUsername)
+def apiTokenProperty = user.getProperty(ApiTokenProperty.class)
+
+// Check if token property exists
+if (!apiTokenProperty) {
+    user.addProperty(new ApiTokenProperty())
+    apiTokenProperty = user.getProperty(ApiTokenProperty.class)
+}
+
+// Generate a new token with a pre-defined value
+def newToken = apiTokenProperty.tokenStore.addFixedNewToken(apiTokenName, apiTokenValue)
+
+user.save()

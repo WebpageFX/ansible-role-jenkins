@@ -65,6 +65,27 @@
     group: "{{ jenkins_process_group }}"
     mode: 0775
 
+- name: Configure default users
+  template:
+    src: basic-security.groovy.j2
+    dest: "{{ jenkins_home }}/init.groovy.d/basic-security.groovy"
+    owner: "{{ jenkins_process_user }}"
+    group: "{{ jenkins_process_group }}"
+    mode: 0775
+  register: jenkins_users_config
+  notify: restart jenkins
+  when: jenkins_admin_password is defined and jenkins_admin_username is defined
+
+- name: Generate API token for admin user
+  template:
+    src: api-token-setup.groovy.j2
+    dest: "{{ jenkins_home }}/init.groovy.d/api-token-setup.groovy"
+    owner: "{{ jenkins_process_user }}"
+    group: "{{ jenkins_process_group }}"
+    mode: 0775
+  when: jenkins_use_api_token | bool and jenkins_admin_username is defined and jenkins_api_token is defined
+  notify: restart jenkins
+
 - name: Configure proxy config for Jenkins
   template:
     src: proxy.xml
