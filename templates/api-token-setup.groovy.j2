@@ -16,7 +16,8 @@ if (!apiTokenProperty) {
     apiTokenProperty = user.getProperty(ApiTokenProperty.class)
 }
 
-// Generate a new token with a pre-defined value
-def newToken = apiTokenProperty.tokenStore.addFixedNewToken(apiTokenName, apiTokenValue)
+// Generate a new token with a pre-defined value. The third argument is the
+// expiration date; null means the token never expires.
+def newToken = apiTokenProperty.tokenStore.addFixedNewToken(apiTokenName, apiTokenValue, null)
 
 user.save()
